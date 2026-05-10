@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<meta name="theme-color" content="#ffffff">
+<title>Sweep — QA testing in 3 minutes, not 3 days</title>
+<meta name="description" content="The first QA platform verified by three different AIs. Claude, GPT-4 and Gemini independently check every bug. Replace 80% of manual QA work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='9' fill='%231d1d1f'/%3E%3Cpath d='M10 16 L14 20 L22 12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+<style>
+:root {
+  --white: #ffffff;
+  --off-white: #fbfbfd;
+  --gray-50: #f5f5f7;
+  --gray-100: #e8e8ed;
+  --gray-200: #d2d2d7;
+  --gray-300: #aeaeb2;
+  --gray-500: #6e6e73;
+  --gray-700: #424245;
+  --black: #1d1d1f;
+  --pure-black: #000000;
+  --blue: #0071e3;
+  --blue-hover: #0077ed;
+  --green: #29CC74;
+  --orange: #F56300;
+  --red: #E5484D;
+  --purple: #7C5CFA;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --radius-lg: 28px;
+
+  --font-display: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  --font-text: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+
+  --container: 1240px;
+  --easing: cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  background: var(--white);
+}
+
+body {
+  font-family: var(--font-text);
+  font-size: 17px;
+  line-height: 1.47;
+  color: var(--black);
+  background: var(--white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.022em;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: 0; background: none; }
+img, svg { display: block; max-width: 100%; }
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+@media (min-width: 768px) { .container { padding: 0 40px; } }
+@media (min-width: 1024px) { .container { padding: 0 48px; } }
+
+/* ============== HEADER ============== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(251, 251, 253, 0.72);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s var(--easing);
+}
+.header.scrolled { border-bottom-color: var(--gray-100); }
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  max-width: var(--container);
+  margin: 0 auto;
+  height: 52px;
+}
+@media (min-width: 768px) { .nav { padding: 12px 40px; } }
+@media (min-width: 1024px) { .nav { padding: 12px 48px; } }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: -0.022em;
+  color: var(--black);
+}
+
+.brand-mark {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.brand-mark svg { width: 100%; height: 100%; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  font-size: 13px;
+  color: var(--gray-700);
+  font-weight: 400;
+  letter-spacing: -0.016em;
+}
+.nav-links a:not(.nav-cta):hover { color: var(--black); }
+.nav-cta {
+  background: var(--black);
+  color: var(--white);
+  padding: 7px 14px;
+  border-radius: 980px;
+  font-weight: 500;
+  font-size: 12px;
+  transition: background 0.25s var(--easing);
+}
+.nav-cta:hover { background: #2a2a2c; }
+
+@media (max-width: 800px) {
+  .nav-links { gap: 12px; }
+  .nav-links a:not(.nav-cta) { display: none; }
+}
+
+/* ============== HERO ============== */
+.hero {
+  padding: 56px 0 32px;
+  text-align: center;
+  background: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+@media (min-width: 768px) { .hero { padding: 88px 0 48px; } }
+@media (min-width: 1024px) { .hero { padding: 112px 0 48px; } }
+
+.hero-eyebrow {
+  display: inline-block;
+  background: linear-gradient(135deg, #FF5E3A 0%, #FF2D55 50%, #AC42FF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.016em;
+  margin-bottom: 14px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--black);
+  margin: 0 auto 18px;
+  max-width: 16ch;
+}
+@media (min-width: 1024px) {
+  .hero-title { font-size: clamp(64px, 6.5vw, 96px); letter-spacing: -0.045em; }
+}
+
+.hero-sub {
+  font-family: var(--font-display);
+  font-size: clamp(19px, 2vw, 26px);
+  line-height: 1.3;
+  color: var(--gray-700);
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  max-width: 36ch;
+  margin: 0 auto 32px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 64px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 22px;
+  border-radius: 980px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.016em;
+  font-family: var(--font-text);
+  transition: background 0.25s var(--easing), transform 0.15s var(--easing);
+  cursor: pointer;
+  white-space: nowrap;
+  min-height: 44px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-pri { background: var(--blue); color: var(--white); }
+.btn-pri:hover { background: var(--blue-hover); }
+.btn-sec { background: transparent; color: var(--blue); padding: 12px 12px; }
+.btn-sec:hover { color: var(--blue-hover); }
+.btn-dark { background: var(--black); color: var(--white); }
+.btn-dark:hover { background: #2a2a2c; }
+.btn-light { background: var(--white); color: var(--black); border: 1px solid var(--gray-200); }
+.btn-light:hover { background: var(--gray-50); }
+
+.btn-arrow { transition: transform 0.25s var(--easing); display: inline-block; }
+.btn:hover .btn-arrow { transform: translateX(2px); }
+
+/* ============== HERO PRODUCT VISUAL ============== */
+.hero-stage {
+  position: relative;
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 0 12px;
+}
+
+/* Floating glow under the laptop */
+.hero-stage::before {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: 5%;
+  right: 5%;
+  height: 80px;
+  background: radial-gradient(ellipse, rgba(124, 92, 250, 0.15) 0%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* MacBook frame */
+.macbook {
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 920px;
+  aspect-ratio: 16 / 10;
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.10)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.08));
+}
+
+.macbook-lid {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #1d1d1f 0%, #2a2a2c 100%);
+  border-radius: 14px 14px 6px 6px;
+  padding: 12px 12px 14px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+.macbook-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--white);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+}
+
+/* Camera notch */
+.macbook-lid::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #0a0a0a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+  z-index: 2;
+}
+
+/* MacBook base/keyboard hint */
+.macbook-base {
+  position: absolute;
+  bottom: -10px;
+  left: -2.5%;
+  right: -2.5%;
+  height: 12px;
+  background: linear-gradient(to bottom, #d2d2d7 0%, #a8a8ad 50%, #8e8e93 100%);
+  border-radius: 0 0 16px 16px;
+  z-index: -1;
+}
+.macbook-base::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 42%;
+  right: 42%;
+  height: 4px;
+  background: linear-gradient(to bottom, #5a5a5e 0%, #3a3a3c 100%);
+  border-radius: 0 0 4px 4px;
+}
+
+/* ============== DASHBOARD INSIDE LAPTOP ============== */
+.dash {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 36px 1fr;
+  background: var(--white);
+  font-size: 11px;
+  letter-spacing: -0.011em;
+  color: var(--black);
+}
+
+.dash-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--gray-100);
+  background: rgba(251, 251, 253, 0.6);
+  backdrop-filter: blur(10px);
+}
+.dash-logo {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+}
+.dash-logo-mark {
+  width: 16px; height: 16px;
+  border-radius: 5px;
+  background: var(--black);
+  display: flex; align-items: center; justify-content: center;
+}
+.dash-logo-mark svg { width: 11px; height: 11px; }
+.dash-search {
+  flex: 1;
+  max-width: 240px;
+  background: var(--gray-50);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 10px;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dash-user {
+  display: flex; gap: 6px; align-items: center;
+  margin-left: auto;
+}
+.dash-bell {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  background: var(--gray-50);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.dash-bell::after {
+  content: '';
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+}
+.dash-avatar {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%);
+}
+
+.dash-body {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  height: 100%;
+  overflow: hidden;
+}
+.dash-side {
+  background: var(--gray-50);
+  border-right: 1px solid var(--gray-100);
+  padding: 10px 8px;
+  display: flex; flex-direction: column;
+  gap: 2px;
+}
+.dash-side-section { font-size: 8px; color: var(--gray-500); padding: 5px 8px 3px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.dash-side-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 8px;
+  font-size: 10px;
+  color: var(--gray-700);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.dash-side-icon {
+  width: 12px; height: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dash-side-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.5; }
+.dash-side-active {
+  background: var(--white);
+  color: var(--black);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);
+}
+
+.dash-main {
+  padding: 14px 16px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 12px;
+}
+
+.dash-h1 {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.dash-h1-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+}
+.dash-h1-meta { font-size: 9px; color: var(--gray-500); }
+
+/* Stat cards */
+.dash-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.dash-stat {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+.dash-stat-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.dash-stat-label { font-size: 8px; color: var(--gray-500); font-weight: 500; }
+.dash-stat-icon { width: 14px; height: 14px; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.dash-stat-icon-grn { background: rgba(41,204,116,0.15); color: var(--green); }
+.dash-stat-icon-org { background: rgba(245,99,0,0.12); color: var(--orange); }
+.dash-stat-icon-pur { background: rgba(124,92,250,0.12); color: var(--purple); }
+.dash-stat-icon-blu { background: rgba(0,113,227,0.12); color: var(--blue); }
+.dash-stat-icon svg { width: 9px; height: 9px; }
+.dash-stat-num {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--black);
+  line-height: 1;
+}
+.dash-stat-trend { font-size: 8px; margin-top: 2px; display: flex; align-items: center; gap: 2px; }
+.dash-stat-trend-up { color: var(--green); }
+.dash-stat-trend-down { color: var(--red); }
+
+/* Bottom split: AI consensus + bug list */
+.dash-split { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; min-height: 0; }
+
+.dash-card {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow: hidden;
+}
+.dash-card-h {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.dash-card-title { font-size: 10px; font-weight: 600; letter-spacing: -0.011em; }
+.dash-card-tag {
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%);
+  color: white;
+  font-size: 7px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Consensus content */
+.consensus { display: flex; flex-direction: column; gap: 6px; }
+.consensus-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 28px;
+  align-items: center;
+  gap: 7px;
+}
+.consensus-vendor {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 500;
+}
+.consensus-dot { width: 6px; height: 6px; border-radius: 50%; }
+.consensus-dot-c { background: linear-gradient(135deg, #FF6B35, #C7522A); }
+.consensus-dot-g { background: linear-gradient(135deg, #10A37F, #1A7F64); }
+.consensus-dot-m { background: linear-gradient(135deg, #4285F4, #1A73E8); }
+.consensus-bar { height: 4px; background: var(--gray-100); border-radius: 2px; overflow: hidden; }
+.consensus-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7C5CFA 0%, #FF2D55 100%);
+  border-radius: 2px;
+}
+.consensus-pct { font-family: var(--font-mono); font-size: 9px; text-align: right; color: var(--black); font-weight: 500; }
+.consensus-result {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(124,92,250,0.06) 0%, rgba(255,45,85,0.06) 100%);
+  border: 1px solid rgba(124,92,250,0.15);
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.consensus-result-label { font-size: 9px; color: var(--gray-700); font-weight: 500; }
+.consensus-result-num {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #7C5CFA, #FF2D55);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Bug list */
+.bugs { display: flex; flex-direction: column; gap: 5px; max-height: 100%; overflow: hidden; }
+.bug-item {
+  display: grid;
+  grid-template-columns: 6px 1fr auto;
+  gap: 7px;
+  align-items: center;
+  padding: 6px 8px;
+  background: var(--white);
+  border-radius: 5px;
+  font-size: 9px;
+}
+.bug-item:hover { background: var(--gray-50); }
+.bug-sev { width: 6px; height: 6px; border-radius: 50%; }
+.bug-sev-h { background: var(--red); box-shadow: 0 0 0 2px rgba(229,72,77,0.20); }
+.bug-sev-m { background: var(--orange); }
+.bug-sev-l { background: var(--gray-300); }
+.bug-text { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.bug-title {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--black);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bug-meta { font-size: 8px; color: var(--gray-500); }
+.bug-time {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+
+/* iPhone — overlapping the laptop */
+.iphone {
+  position: absolute;
+  bottom: -8%;
+  right: -3%;
+  width: 18%;
+  min-width: 130px;
+  max-width: 180px;
+  aspect-ratio: 9 / 19.5;
+  z-index: 5;
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.18)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.10));
+  transform: rotate(4deg);
+  transition: transform 0.6s var(--easing);
+}
+.iphone:hover { transform: rotate(0deg) translateY(-4px); }
+
+.iphone-frame {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1d1d1f 0%, #2a2a2c 100%);
+  border-radius: 24px;
+  padding: 6px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.iphone-screen {
+  width: 100%; height: 100%;
+  background: var(--white);
+  border-radius: 19px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dynamic island */
+.iphone-island {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32%;
+  height: 14px;
+  background: #000;
+  border-radius: 999px;
+  z-index: 5;
+}
+
+.iphone-status {
+  display: flex; justify-content: space-between;
+  padding: 7px 14px 0;
+  font-size: 8px; font-weight: 600;
+  color: var(--black);
+  font-family: var(--font-mono);
+}
+
+.iphone-content {
+  flex: 1;
+  padding: 18px 9px 6px;
+  overflow: hidden;
+}
+
+.iphone-h {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  margin-bottom: 8px;
+}
+.iphone-sub { font-size: 7px; color: var(--gray-500); margin-bottom: 8px; }
+
+.iphone-test-list { display: flex; flex-direction: column; gap: 4px; }
+.iphone-test {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  gap: 5px;
+  align-items: center;
+  padding: 5px 6px;
+  background: var(--gray-50);
+  border-radius: 5px;
+  font-size: 8px;
+}
+.iphone-test-live {
+  background: linear-gradient(135deg, rgba(124,92,250,0.10) 0%, rgba(255,45,85,0.10) 100%);
+  border: 1px solid rgba(124,92,250,0.20);
+}
+.iphone-tdot { width: 5px; height: 5px; border-radius: 50%; }
+.iphone-tdot-ok { background: var(--green); }
+.iphone-tdot-live {
+  background: var(--purple);
+  box-shadow: 0 0 0 0 rgba(124,92,250,0.5);
+  animation: ping 1.5s ease-out infinite;
+}
+.iphone-tdot-pen { background: var(--gray-300); }
+.iphone-tname { font-size: 8px; color: var(--black); font-weight: 500; }
+.iphone-tag {
+  font-size: 6px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.iphone-tag-ok { background: rgba(41,204,116,0.15); color: var(--green); }
+.iphone-tag-live { background: var(--purple); color: white; }
+.iphone-tag-pen { background: var(--gray-100); color: var(--gray-500); }
+
+@keyframes ping {
+  0% { box-shadow: 0 0 0 0 rgba(124,92,250,0.50); }
+  100% { box-shadow: 0 0 0 6px rgba(124,92,250,0); }
+}
+
+/* Floating verification badges */
+.float-badge {
+  position: absolute;
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: 980px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.016em;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 6;
+  animation: float-y 6s ease-in-out infinite;
+}
+.float-badge-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.fb-1 { top: 6%; left: -2%; animation-delay: 0s; }
+.fb-1 .float-badge-dot { background: linear-gradient(135deg, #FF6B35, #C7522A); }
+.fb-2 { top: 32%; left: -7%; animation-delay: 1.5s; }
+.fb-2 .float-badge-dot { background: linear-gradient(135deg, #10A37F, #1A7F64); }
+.fb-3 { top: 18%; right: -2%; animation-delay: 3s; }
+.fb-3 .float-badge-dot { background: linear-gradient(135deg, #4285F4, #1A73E8); }
+
+@keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+@media (max-width: 768px) {
+  .float-badge { padding: 6px 10px; font-size: 10px; }
+  .fb-1 { top: 2%; left: 2%; }
+  .fb-2 { top: 28%; left: 0%; }
+  .fb-3 { top: 12%; right: 2%; }
+}
+@media (max-width: 480px) {
+  .iphone { display: none; }
+  .float-badge { display: none; }
+}
+
+/* ============== STATS BAR ============== */
+.stats-bar {
+  padding: 64px 0;
+  background: var(--off-white);
+  border-top: 1px solid var(--gray-100);
+  border-bottom: 1px solid var(--gray-100);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  text-align: center;
+}
+@media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4.5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--black);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-num-grad {
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 50%, #FF5E3A 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.stat-lbl {
+  font-size: 14px;
+  color: var(--gray-700);
+  font-weight: 400;
+  letter-spacing: -0.016em;
+}
+
+/* ============== SECTION ============== */
+.section {
+  padding: 96px 0;
+  background: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+@media (min-width: 1024px) { .section { padding: 128px 0; } }
+
+.section-light { background: var(--off-white); }
+.section-dark {
+  background: var(--black);
+  color: var(--white);
+}
+.section-dark .section-title, .section-dark .section-eyebrow { color: var(--white); }
+.section-dark .section-sub { color: var(--gray-300); }
+
+.section-eyebrow {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 60px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--black);
+  text-align: center;
+  margin: 0 auto 16px;
+  max-width: 18ch;
+}
+.section-sub {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.6vw, 22px);
+  line-height: 1.35;
+  color: var(--gray-700);
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  text-align: center;
+  max-width: 56ch;
+  margin: 0 auto 64px;
+}
+
+/* ============== HOW IT WORKS — 3 cards ============== */
+.steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+@media (min-width: 768px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+
+.step-card {
+  background: var(--off-white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s var(--easing);
+}
+.step-card:hover { transform: translateY(-4px); }
+
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-500);
+  margin-bottom: 12px;
+}
+.step-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  color: var(--black);
+}
+.step-desc {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--gray-700);
+  margin-bottom: 24px;
+}
+
+.step-visual {
+  margin-top: auto;
+  background: var(--white);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--gray-100);
+  box-shadow: 0 8px 24px -8px rgba(0,0,0,0.04);
+}
+
+/* Step 1 visual: URL input */
+.step-input {
+  background: var(--gray-50);
+  border-radius: 8px;
+  padding: 12px;
+}
+.step-input-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--gray-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.step-input-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--black);
+  display: flex;
+  align-items: center;
+}
+.step-caret {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  background: var(--blue);
+  margin-left: 2px;
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+.step-files {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+.step-file {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 3px 7px;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+/* Step 2 visual: AI working */
+.step-ai {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.step-ai-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--gray-700);
+}
+.step-ai-active { color: var(--black); font-weight: 500; }
+.step-ai-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.step-ai-dot-live {
+  background: var(--purple);
+  box-shadow: 0 0 0 0 rgba(124, 92, 250, 0.5);
+  animation: ping 1.5s ease-out infinite;
+}
+.step-ai-progress {
+  margin-top: 8px;
+  height: 4px;
+  background: var(--gray-100);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.step-ai-progress-fill {
+  height: 100%;
+  width: 65%;
+  background: linear-gradient(90deg, #7C5CFA 0%, #FF2D55 100%);
+  border-radius: 2px;
+  animation: progress 3s ease-in-out infinite;
+}
+@keyframes progress {
+  0% { width: 30%; }
+  50% { width: 75%; }
+  100% { width: 30%; }
+}
+
+/* Step 3 visual: Slack notification */
+.step-slack {
+  background: var(--white);
+}
+.step-slack-h {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.step-slack-av {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.step-slack-av svg { width: 16px; height: 16px; }
+.step-slack-meta {
+  display: flex; align-items: baseline; gap: 6px;
+  font-size: 11px;
+}
+.step-slack-meta strong { font-weight: 600; color: var(--black); font-size: 12px; }
+.step-slack-meta span { color: var(--gray-500); font-size: 10px; }
+.step-slack-body {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--black);
+  background: var(--gray-50);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.step-slack-tag {
+  display: inline-block;
+  background: rgba(229,72,77,0.12);
+  color: var(--red);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* ============== FEATURE BENTO ============== */
+.bento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+@media (min-width: 768px) { .bento { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) {
+  .bento {
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 280px;
+  }
+  .bento-12 { grid-column: span 4; grid-row: span 2; }
+  .bento-22 { grid-column: span 2; grid-row: span 2; }
+  .bento-2  { grid-column: span 2; }
+  .bento-3  { grid-column: span 3; }
+  .bento-31 { grid-column: span 3; }
+}
+
+.bento-card {
+  background: var(--off-white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s var(--easing);
+}
+.bento-card:hover { transform: translateY(-4px); }
+
+.bento-card-dark {
+  background: var(--black);
+  color: var(--white);
+}
+.bento-card-dark .bento-title { color: var(--white); }
+.bento-card-dark .bento-desc { color: var(--gray-300); }
+
+.bento-card-purple {
+  background: linear-gradient(135deg, #1d1d1f 0%, #2d1b4f 100%);
+  color: var(--white);
+}
+.bento-card-purple .bento-title { color: var(--white); }
+.bento-card-purple .bento-desc { color: var(--gray-300); }
+
+.bento-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.bento-card-dark .bento-eyebrow,
+.bento-card-purple .bento-eyebrow {
+  background: linear-gradient(135deg, #A78BFA 0%, #F472B6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bento-title {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+  color: var(--black);
+}
+.bento-desc {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--gray-700);
+  margin-bottom: 16px;
+}
+
+.bento-illus {
+  margin-top: auto;
+}
+
+/* Bento card 1: Self-healing tests illustration */
+.heal-illus {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 16px;
+  border: 1px solid var(--gray-100);
+  position: relative;
+}
+.bento-card-dark .heal-illus {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+}
+.heal-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.heal-row-old { background: rgba(229,72,77,0.10); color: var(--red); text-decoration: line-through; }
+.heal-row-new { background: rgba(41,204,116,0.10); color: var(--green); }
+.heal-row-arrow {
+  font-size: 14px;
+  text-align: center;
+  color: var(--gray-500);
+  margin: 4px 0;
+}
+.bento-card-dark .heal-row-arrow { color: var(--gray-500); }
+
+/* Bento card: visual diff */
+.diff-illus {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+}
+.diff-frame {
+  aspect-ratio: 4/3;
+  border-radius: 10px;
+  border: 1px solid var(--gray-100);
+  padding: 10px;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+}
+.bento-card-dark .diff-frame { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+.diff-line { height: 6px; background: var(--gray-100); border-radius: 3px; }
+.bento-card-dark .diff-line { background: rgba(255,255,255,0.08); }
+.diff-line-w70 { width: 70%; }
+.diff-line-w50 { width: 50%; }
+.diff-frame-tag {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.diff-tag-ok { background: rgba(41,204,116,0.15); color: var(--green); }
+.diff-tag-bad { background: rgba(229,72,77,0.15); color: var(--red); }
+.diff-line-changed { background: rgba(229,72,77,0.30); }
+
+/* CI badge */
+.ci-illus {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--gray-100);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bento-card-dark .ci-illus { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+.ci-row {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.ci-status {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  color: white;
+  font-weight: 700;
+}
+.ci-status-pass { background: var(--green); }
+.ci-status-fail { background: var(--red); }
+.ci-status-pend { background: var(--gray-200); color: var(--gray-700); }
+.ci-text { font-size: 11px; color: var(--gray-700); }
+.bento-card-dark .ci-text { color: var(--gray-300); }
+
+/* Notifications grid */
+.notif-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.notif-item {
+  background: var(--white);
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid var(--gray-100);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+}
+.bento-card-dark .notif-item {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+  color: var(--white);
+}
+.notif-icon {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+}
+.notif-icon svg { width: 16px; height: 16px; }
+.notif-slack { background: rgba(74,21,75,0.10); color: #4A154B; }
+.notif-teams { background: rgba(70,77,176,0.10); color: #464DB0; }
+.notif-pager { background: rgba(6,162,84,0.10); color: #06A254; }
+.notif-discord { background: rgba(88,101,242,0.10); color: #5865F2; }
+.notif-email { background: rgba(0,113,227,0.10); color: var(--blue); }
+.notif-jira { background: rgba(0,82,204,0.10); color: #0052CC; }
+.notif-linear { background: rgba(94,106,210,0.10); color: #5E6AD2; }
+.notif-github { background: rgba(0,0,0,0.06); color: #1d1d1f; }
+.bento-card-dark .notif-icon { background: rgba(255,255,255,0.06); color: white; }
+
+/* Env icons */
+.env-list {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 12px;
+}
+.env-row {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--gray-100);
+}
+.bento-card-dark .env-row { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+.env-name { font-family: var(--font-mono); font-size: 11px; font-weight: 500; flex: 1; }
+.env-status { display: flex; align-items: center; gap: 4px; font-size: 10px; }
+.env-pulse { width: 6px; height: 6px; border-radius: 50%; }
+
+/* BYOK / 3 vendor logos */
+.byok-row {
+  display: flex; gap: 8px;
+  margin-top: 14px;
+}
+.byok-card {
+  flex: 1;
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.bento-card-dark .byok-card {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+}
+.byok-logo {
+  width: 24px; height: 24px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: white;
+  font-family: var(--font-display);
+}
+.byok-c { background: linear-gradient(135deg, #FF6B35, #C7522A); }
+.byok-g { background: linear-gradient(135deg, #10A37F, #1A7F64); }
+.byok-m { background: linear-gradient(135deg, #4285F4, #1A73E8); }
+.byok-name { font-size: 10px; font-weight: 600; }
+.byok-vendor { font-size: 9px; color: var(--gray-500); }
+.bento-card-dark .byok-vendor { color: var(--gray-300); }
+
+/* Flake retry illus */
+.flake-illus {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.bento-card-dark .flake-illus { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+.flake-row { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; }
+.flake-attempt { color: var(--gray-500); width: 56px; }
+.flake-status {
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+.flake-fail { background: rgba(229,72,77,0.15); color: var(--red); }
+.flake-pass { background: rgba(41,204,116,0.15); color: var(--green); }
+.flake-flag { color: var(--orange); font-style: italic; font-size: 10px; }
+
+/* ============== AI CONSENSUS DIAGRAM (large) ============== */
+.consensus-large {
+  max-width: 980px;
+  margin: 0 auto 64px;
+  background: var(--off-white);
+  border-radius: var(--radius-lg);
+  padding: 48px 32px;
+  position: relative;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .consensus-large { padding: 64px; }
+}
+
+.consensus-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .consensus-grid { grid-template-columns: 1fr auto 1fr; gap: 48px; }
+}
+
+.consensus-vendors-col {
+  display: flex; flex-direction: column;
+  gap: 14px;
+}
+
+.vendor-card {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  transition: transform 0.3s var(--easing), border-color 0.3s var(--easing);
+}
+.vendor-card:hover { transform: translateX(4px); border-color: var(--gray-200); }
+
+.vendor-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: white;
+}
+.vendor-icon-claude { background: linear-gradient(135deg, #FF6B35 0%, #C7522A 100%); }
+.vendor-icon-gpt { background: linear-gradient(135deg, #10A37F 0%, #0E8A6B 100%); }
+.vendor-icon-gemini { background: linear-gradient(135deg, #4285F4 0%, #1A73E8 100%); }
+
+.vendor-meta { flex: 1; min-width: 0; }
+.vendor-vendor {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gray-500);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.vendor-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--black);
+  margin-bottom: 2px;
+}
+.vendor-role { font-size: 13px; color: var(--gray-700); }
+
+.vendor-conf {
+  text-align: right;
+  flex-shrink: 0;
+}
+.vendor-conf-num {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.vendor-conf-lbl {
+  font-size: 9px;
+  color: var(--gray-500);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.consensus-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.consensus-circle {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 50%, #FF5E3A 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  position: relative;
+  box-shadow:
+    0 24px 48px -12px rgba(124, 92, 250, 0.40),
+    0 12px 24px -6px rgba(255, 45, 85, 0.25);
+  animation: consensus-pulse 3s ease-in-out infinite;
+}
+@keyframes consensus-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.consensus-circle-lbl {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+.consensus-circle-num {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.consensus-status-text {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+.consensus-status-text strong { color: var(--green); }
+
+.consensus-output {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 20px 24px;
+  border: 1px solid var(--gray-100);
+}
+.consensus-output-h {
+  font-size: 11px;
+  color: var(--gray-500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.consensus-output-bug {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  color: var(--black);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.consensus-output-meta {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
+}
+.cmeta-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.cmeta-h { background: rgba(229,72,77,0.10); color: var(--red); }
+.cmeta-default { background: var(--gray-50); color: var(--gray-700); }
+.consensus-output-action {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px;
+  color: var(--gray-700);
+  padding-top: 12px;
+  border-top: 1px solid var(--gray-100);
+}
+.consensus-output-action strong { color: var(--black); font-weight: 600; }
+
+/* ============== PRICING ============== */
+.pricing {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+@media (min-width: 768px) { .pricing { grid-template-columns: 1fr 1fr; gap: 20px; } }
+
+.tier {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.tier-featured {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+.tier-badge {
+  position: absolute;
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 980px;
+}
+
+.tier-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-bottom: 4px;
+}
+.tier-desc {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 24px;
+}
+.tier-featured .tier-desc { color: var(--gray-300); }
+
+.tier-price {
+  display: flex; align-items: baseline; gap: 4px;
+  margin-bottom: 6px;
+}
+.tier-amount {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 4vw, 52px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.tier-period { font-size: 14px; color: var(--gray-500); }
+.tier-featured .tier-period { color: var(--gray-300); }
+.tier-trial {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--gray-500);
+  margin: 0 0 24px;
+}
+.tier-featured .tier-trial { color: var(--gray-300); }
+
+.tier-list {
+  list-style: none;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--gray-100);
+  margin-bottom: 28px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tier-featured .tier-list { border-color: rgba(255,255,255,0.10); }
+.tier-list li {
+  font-size: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+.tier-list li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 16px; height: 16px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%);
+  background-image: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M5 8 L7 10 L11 6' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: normal;
+}
+
+.tier-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 980px;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.016em;
+  transition: background 0.25s var(--easing);
+  cursor: pointer;
+}
+.tier-cta-pri { background: var(--black); color: var(--white); }
+.tier-cta-pri:hover { background: #2a2a2c; }
+.tier-cta-light { background: var(--white); color: var(--black); }
+.tier-cta-light:hover { background: var(--gray-50); }
+
+/* ============== CTA ============== */
+.cta-section {
+  padding: 96px 0;
+  background: var(--off-white);
+  text-align: center;
+  border-top: 1px solid var(--gray-100);
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute;
+  bottom: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 600px; height: 200px;
+  background: radial-gradient(ellipse, rgba(124,92,250,0.10) 0%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+.cta-section > * { position: relative; }
+
+.cta-form {
+  display: flex;
+  gap: 8px;
+  max-width: 480px;
+  margin: 32px auto 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cta-form input {
+  flex: 1;
+  min-width: 240px;
+  padding: 14px 20px;
+  border-radius: 980px;
+  border: 1px solid var(--gray-200);
+  font-family: inherit;
+  font-size: 15px;
+  background: var(--white);
+  letter-spacing: -0.016em;
+  min-height: 48px;
+  color: var(--black);
+}
+.cta-form input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0,113,227,0.20);
+}
+.cta-form button {
+  padding: 14px 28px;
+  border-radius: 980px;
+  background: var(--black);
+  color: white;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: -0.016em;
+  min-height: 48px;
+}
+.cta-form button:hover { background: #2a2a2c; }
+
+.cta-note {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-top: 16px;
+}
+
+/* ============== FOOTER ============== */
+.footer {
+  background: var(--off-white);
+  padding: 48px 0 32px;
+  border-top: 1px solid var(--gray-100);
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+@media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+
+.footer-brand-col { grid-column: 1 / -1; }
+@media (min-width: 768px) { .footer-brand-col { grid-column: auto; } }
+.footer-tag {
+  margin-top: 12px;
+  color: var(--gray-700);
+  font-size: 13px;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.footer-col h4 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.016em;
+  margin-bottom: 12px;
+}
+.footer-col a {
+  display: block;
+  font-size: 13px;
+  color: var(--gray-700);
+  margin-bottom: 8px;
+  transition: color 0.2s var(--easing);
+}
+.footer-col a:hover { color: var(--black); }
+
+.footer-bottom {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--gray-100);
+  font-size: 12px;
+  color: var(--gray-500);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Reveal anim */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s var(--easing), transform 0.8s var(--easing);
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .float-badge, .iphone-tdot-live, .step-ai-dot-live, .consensus-circle, .step-ai-progress-fill, .step-caret { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="header" id="header">
+  <div class="nav">
+    <a href="/" class="brand">
+      <span class="brand-mark"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="28" height="28" rx="9" fill="#1d1d1f"/><path d="M10 16 L14 20 L22 12" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span>Sweep</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#first">Industry first</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#start" class="nav-cta">Start free</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="container">
+    <span class="hero-eyebrow">Industry-first triple-AI verification</span>
+    <h1 class="hero-title">QA testing in 3 minutes. Not 3 days.</h1>
+    <p class="hero-sub">The first QA platform verified by three different AIs. Claude, GPT-4 and Gemini independently check every bug.</p>
+    <div class="hero-cta">
+      <a href="#start" class="btn btn-pri">Start 14-day trial <span class="btn-arrow">→</span></a>
+      <a href="#how" class="btn btn-sec">See how it works <span class="btn-arrow">→</span></a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="hero-stage">
+      <span class="float-badge fb-1"><span class="float-badge-dot"></span> Claude verified</span>
+      <span class="float-badge fb-2"><span class="float-badge-dot"></span> GPT-4 verified</span>
+      <span class="float-badge fb-3"><span class="float-badge-dot"></span> Gemini verified</span>
+
+      <div class="macbook">
+        <div class="macbook-lid">
+          <div class="macbook-screen">
+            <div class="dash">
+              <div class="dash-topbar">
+                <div class="dash-logo">
+                  <span class="dash-logo-mark"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M10 16 L14 20 L22 12" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                  Sweep
+                </div>
+                <div class="dash-search">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  Search bugs, runs, projects...
+                </div>
+                <div class="dash-user">
+                  <div class="dash-bell">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0112 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>
+                  </div>
+                  <div class="dash-avatar"></div>
+                </div>
+              </div>
+
+              <div class="dash-body">
+                <aside class="dash-side">
+                  <div class="dash-side-section">Workspace</div>
+                  <div class="dash-side-item dash-side-active">
+                    <span class="dash-side-icon"><svg viewBox="0 0 24 24"><path d="M12 8v4M12 16h.01M22 12a10 10 0 11-20 0 10 10 0 0120 0z"/></svg></span>
+                    Bugs <span style="margin-left:auto; background: var(--red); color:white; font-size:8px; padding:1px 4px; border-radius:6px;">3</span>
+                  </div>
+                  <div class="dash-side-item">
+                    <span class="dash-side-icon"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
+                    Runs
+                  </div>
+                  <div class="dash-side-item">
+                    <span class="dash-side-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+                    Projects
+                  </div>
+                  <div class="dash-side-item">
+                    <span class="dash-side-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></span>
+                    Reports
+                  </div>
+                  <div class="dash-side-section" style="margin-top:8px;">Settings</div>
+                  <div class="dash-side-item">
+                    <span class="dash-side-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg></span>
+                    Team
+                  </div>
+                  <div class="dash-side-item">
+                    <span class="dash-side-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51"/></svg></span>
+                    Settings
+                  </div>
+                </aside>
+
+                <div class="dash-main">
+                  <div class="dash-h1">
+                    <div>
+                      <div class="dash-h1-title">Today's overview</div>
+                      <div class="dash-h1-meta">Production · Last run 2 minutes ago</div>
+                    </div>
+                    <span style="font-size:9px; color: var(--green); display:flex; align-items:center; gap:3px;"><span style="width:5px;height:5px;background:var(--green);border-radius:50%;"></span> Live</span>
+                  </div>
+
+                  <div class="dash-stats">
+                    <div class="dash-stat">
+                      <div class="dash-stat-row">
+                        <span class="dash-stat-label">Tests passing</span>
+                        <span class="dash-stat-icon dash-stat-icon-grn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></span>
+                      </div>
+                      <div class="dash-stat-num">47</div>
+                      <div class="dash-stat-trend dash-stat-trend-up">↑ 3 today</div>
+                    </div>
+                    <div class="dash-stat">
+                      <div class="dash-stat-row">
+                        <span class="dash-stat-label">Critical bugs</span>
+                        <span class="dash-stat-icon dash-stat-icon-org"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></span>
+                      </div>
+                      <div class="dash-stat-num">3</div>
+                      <div class="dash-stat-trend dash-stat-trend-down">↑ 2 new</div>
+                    </div>
+                    <div class="dash-stat">
+                      <div class="dash-stat-row">
+                        <span class="dash-stat-label">Coverage</span>
+                        <span class="dash-stat-icon dash-stat-icon-pur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+                      </div>
+                      <div class="dash-stat-num">92<span style="font-size:11px;">%</span></div>
+                      <div class="dash-stat-trend dash-stat-trend-up">↑ 4% this week</div>
+                    </div>
+                    <div class="dash-stat">
+                      <div class="dash-stat-row">
+                        <span class="dash-stat-label">Avg run time</span>
+                        <span class="dash-stat-icon dash-stat-icon-blu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></span>
+                      </div>
+                      <div class="dash-stat-num">1.2<span style="font-size:11px;">s</span></div>
+                      <div class="dash-stat-trend dash-stat-trend-up">↓ 0.3s faster</div>
+                    </div>
+                  </div>
+
+                  <div class="dash-split">
+                    <div class="dash-card">
+                      <div class="dash-card-h">
+                        <div class="dash-card-title">AI Verification — current bug</div>
+                        <span class="dash-card-tag">3 of 3 agree</span>
+                      </div>
+                      <div class="consensus">
+                        <div class="consensus-row">
+                          <div class="consensus-vendor"><span class="consensus-dot consensus-dot-c"></span> Claude</div>
+                          <div class="consensus-bar"><div class="consensus-fill" style="width:96%"></div></div>
+                          <div class="consensus-pct">0.96</div>
+                        </div>
+                        <div class="consensus-row">
+                          <div class="consensus-vendor"><span class="consensus-dot consensus-dot-g"></span> GPT-4</div>
+                          <div class="consensus-bar"><div class="consensus-fill" style="width:91%"></div></div>
+                          <div class="consensus-pct">0.91</div>
+                        </div>
+                        <div class="consensus-row">
+                          <div class="consensus-vendor"><span class="consensus-dot consensus-dot-m"></span> Gemini</div>
+                          <div class="consensus-bar"><div class="consensus-fill" style="width:88%"></div></div>
+                          <div class="consensus-pct">0.88</div>
+                        </div>
+                        <div class="consensus-result">
+                          <span class="consensus-result-label">Consensus score</span>
+                          <span class="consensus-result-num">0.92</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="dash-card">
+                      <div class="dash-card-h">
+                        <div class="dash-card-title">Recent activity</div>
+                        <a href="#" style="font-size:9px; color: var(--blue);">View all →</a>
+                      </div>
+                      <div class="bugs">
+                        <div class="bug-item">
+                          <span class="bug-sev bug-sev-h"></span>
+                          <div class="bug-text">
+                            <span class="bug-title">Submit button broken on iPhone</span>
+                            <span class="bug-meta">iOS · Safari</span>
+                          </div>
+                          <span class="bug-time">2m</span>
+                        </div>
+                        <div class="bug-item">
+                          <span class="bug-sev bug-sev-h"></span>
+                          <div class="bug-text">
+                            <span class="bug-title">Login redirect loop in staging</span>
+                            <span class="bug-meta">Web · Chrome</span>
+                          </div>
+                          <span class="bug-time">8m</span>
+                        </div>
+                        <div class="bug-item">
+                          <span class="bug-sev bug-sev-m"></span>
+                          <div class="bug-text">
+                            <span class="bug-title">Search filter shows duplicates</span>
+                            <span class="bug-meta">Android · Pixel 8</span>
+                          </div>
+                          <span class="bug-time">23m</span>
+                        </div>
+                        <div class="bug-item">
+                          <span class="bug-sev bug-sev-l"></span>
+                          <div class="bug-text">
+                            <span class="bug-title">Footer link "Terms" 404</span>
+                            <span class="bug-meta">Web · All browsers</span>
+                          </div>
+                          <span class="bug-time">1h</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="macbook-base"></div>
+      </div>
+
+      <div class="iphone">
+        <div class="iphone-frame">
+          <div class="iphone-screen">
+            <div class="iphone-island"></div>
+            <div class="iphone-status"><span>9:41</span><span>● ●</span></div>
+            <div class="iphone-content">
+              <div class="iphone-h">Sweep</div>
+              <div class="iphone-sub">Mobile checkout flow</div>
+              <div class="iphone-test-list">
+                <div class="iphone-test"><span class="iphone-tdot iphone-tdot-ok"></span><span class="iphone-tname">Login</span><span class="iphone-tag iphone-tag-ok">Pass</span></div>
+                <div class="iphone-test"><span class="iphone-tdot iphone-tdot-ok"></span><span class="iphone-tname">Browse</span><span class="iphone-tag iphone-tag-ok">Pass</span></div>
+                <div class="iphone-test iphone-test-live"><span class="iphone-tdot iphone-tdot-live"></span><span class="iphone-tname">Cart</span><span class="iphone-tag iphone-tag-live">Live</span></div>
+                <div class="iphone-test"><span class="iphone-tdot iphone-tdot-pen"></span><span class="iphone-tname">Pay</span><span class="iphone-tag iphone-tag-pen">Wait</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div><div class="stat-num">90<span style="font-size:0.5em;">s</span></div><div class="stat-lbl">Setup time</div></div>
+      <div><div class="stat-num stat-num-grad">3</div><div class="stat-lbl">AI vendors per bug</div></div>
+      <div><div class="stat-num">80<span style="font-size:0.5em;">%</span></div><div class="stat-lbl">QA time saved</div></div>
+      <div><div class="stat-num">$79</div><div class="stat-lbl">Starting price/mo</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="section">
+  <div class="container">
+    <span class="section-eyebrow">How it works</span>
+    <h2 class="section-title">Three steps. Then it just runs.</h2>
+    <p class="section-sub">Setup happens once. After that, Sweep tests every push, every deploy, every hour — without you doing anything.</p>
+
+    <div class="steps">
+      <article class="step-card reveal">
+        <div class="step-num">Step 01</div>
+        <h3 class="step-title">Paste a URL or upload your app</h3>
+        <p class="step-desc">A web URL, an .ipa or .apk binary, or a TestFlight connection. That's all we need.</p>
+        <div class="step-visual">
+          <div class="step-input">
+            <div class="step-input-lbl">Your app URL</div>
+            <div class="step-input-val">app.acme.com<span class="step-caret"></span></div>
+          </div>
+          <div class="step-files">
+            <span class="step-file">app.ipa</span>
+            <span class="step-file">app.apk</span>
+            <span class="step-file">testflight</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="step-card reveal">
+        <div class="step-num">Step 02</div>
+        <h3 class="step-title">AI generates and runs tests</h3>
+        <p class="step-desc">Claude crawls your app, identifies critical user flows, writes tests with multi-fallback selectors.</p>
+        <div class="step-visual">
+          <div class="step-ai">
+            <div class="step-ai-line"><span class="step-ai-dot"></span> Crawled /home</div>
+            <div class="step-ai-line"><span class="step-ai-dot"></span> Found login flow</div>
+            <div class="step-ai-line"><span class="step-ai-dot"></span> Found checkout flow</div>
+            <div class="step-ai-line step-ai-active"><span class="step-ai-dot step-ai-dot-live"></span> Generating tests...</div>
+          </div>
+          <div class="step-ai-progress"><div class="step-ai-progress-fill"></div></div>
+        </div>
+      </article>
+
+      <article class="step-card reveal">
+        <div class="step-num">Step 03</div>
+        <h3 class="step-title">Three AIs verify, you get pinged</h3>
+        <p class="step-desc">If they agree, you get a Slack, Teams, email, or PagerDuty alert with video and root cause.</p>
+        <div class="step-visual step-slack">
+          <div class="step-slack-h">
+            <div class="step-slack-av">
+              <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M10 16 L14 20 L22 12" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="step-slack-meta"><strong>Sweep</strong> <span>just now</span></div>
+          </div>
+          <div class="step-slack-body">
+            <span class="step-slack-tag">High severity</span>
+            Submit button broken on mobile checkout. Verified by Claude, GPT-4, Gemini.
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="first" class="section section-light">
+  <div class="container">
+    <span class="section-eyebrow">Industry first</span>
+    <h2 class="section-title">Three AIs. One verdict.</h2>
+    <p class="section-sub">Mabl uses one AI. Testim uses one AI. QA Wolf uses humans. Bug0 uses humans plus one AI. We use Claude, GPT-4, and Gemini independently.</p>
+
+    <div class="consensus-large">
+      <div class="consensus-grid">
+        <div class="consensus-vendors-col">
+          <div class="vendor-card">
+            <div class="vendor-icon vendor-icon-claude">C</div>
+            <div class="vendor-meta">
+              <div class="vendor-vendor">Anthropic</div>
+              <div class="vendor-name">Claude</div>
+              <div class="vendor-role">Generator role</div>
+            </div>
+            <div class="vendor-conf">
+              <div class="vendor-conf-num">0.96</div>
+              <div class="vendor-conf-lbl">conf</div>
+            </div>
+          </div>
+          <div class="vendor-card">
+            <div class="vendor-icon vendor-icon-gpt">G</div>
+            <div class="vendor-meta">
+              <div class="vendor-vendor">OpenAI</div>
+              <div class="vendor-name">GPT-4</div>
+              <div class="vendor-role">Verifier role</div>
+            </div>
+            <div class="vendor-conf">
+              <div class="vendor-conf-num">0.91</div>
+              <div class="vendor-conf-lbl">conf</div>
+            </div>
+          </div>
+          <div class="vendor-card">
+            <div class="vendor-icon vendor-icon-gemini">M</div>
+            <div class="vendor-meta">
+              <div class="vendor-vendor">Google</div>
+              <div class="vendor-name">Gemini</div>
+              <div class="vendor-role">Adversary role</div>
+            </div>
+            <div class="vendor-conf">
+              <div class="vendor-conf-num">0.88</div>
+              <div class="vendor-conf-lbl">conf</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="consensus-center">
+          <div class="consensus-circle">
+            <div class="consensus-circle-lbl">Consensus</div>
+            <div class="consensus-circle-num">0.92</div>
+          </div>
+          <div class="consensus-status-text"><strong>3 of 3 agree</strong> · Alerting team</div>
+        </div>
+
+        <div class="consensus-output">
+          <div class="consensus-output-h">Verified bug</div>
+          <div class="consensus-output-bug">Submit button unresponsive on mobile checkout</div>
+          <div class="consensus-output-meta">
+            <span class="cmeta-tag cmeta-h">High</span>
+            <span class="cmeta-tag cmeta-default">iPhone 15</span>
+            <span class="cmeta-tag cmeta-default">Safari</span>
+            <span class="cmeta-tag cmeta-default">Production</span>
+          </div>
+          <div class="consensus-output-action">
+            <strong>Posted to #engineering</strong> · 9:14 AM
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="section">
+  <div class="container">
+    <span class="section-eyebrow">What you get</span>
+    <h2 class="section-title">More than tests. Confidence.</h2>
+    <p class="section-sub">Everything a manual QA team gives you, on autopilot — for one-tenth the cost of hiring one.</p>
+
+    <div class="bento">
+      <div class="bento-card bento-card-purple bento-12 reveal">
+        <div class="bento-eyebrow">Self-healing</div>
+        <h3 class="bento-title">When the UI changes, tests rewrite themselves.</h3>
+        <p class="bento-desc">Multi-fallback selectors and AI element matching. Deploy day stops being red-test ritual day.</p>
+        <div class="bento-illus">
+          <div class="heal-illus">
+            <div class="heal-row heal-row-old">button[id="submit-old"]</div>
+            <div class="heal-row-arrow">↓ AI repaired</div>
+            <div class="heal-row heal-row-new">button[data-action="submit"]</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-22 reveal">
+        <div class="bento-eyebrow">Visual regression</div>
+        <h3 class="bento-title">Catches what humans miss.</h3>
+        <p class="bento-desc">Per-step screenshots. AI classifies what changed.</p>
+        <div class="bento-illus">
+          <div class="diff-illus">
+            <div class="diff-frame">
+              <span class="diff-frame-tag diff-tag-ok">OK</span>
+              <div class="diff-line diff-line-w70"></div>
+              <div class="diff-line diff-line-w50"></div>
+              <div class="diff-line"></div>
+            </div>
+            <div class="diff-frame">
+              <span class="diff-frame-tag diff-tag-bad">Diff</span>
+              <div class="diff-line diff-line-w70"></div>
+              <div class="diff-line diff-line-w50 diff-line-changed"></div>
+              <div class="diff-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-2 reveal">
+        <div class="bento-eyebrow">Pre-deploy block</div>
+        <h3 class="bento-title">Bad code can't ship.</h3>
+        <p class="bento-desc">GitHub status check before merge.</p>
+        <div class="bento-illus">
+          <div class="ci-illus">
+            <div class="ci-row"><span class="ci-status ci-status-pass">✓</span><span class="ci-text">Build passing</span></div>
+            <div class="ci-row"><span class="ci-status ci-status-pass">✓</span><span class="ci-text">Tests passing</span></div>
+            <div class="ci-row"><span class="ci-status ci-status-pass">✓</span><span class="ci-text">Sweep QA verified</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-card-dark bento-3 reveal">
+        <div class="bento-eyebrow">Notifications</div>
+        <h3 class="bento-title">Routes to where your team lives.</h3>
+        <p class="bento-desc">10+ destinations. Different severities to different channels.</p>
+        <div class="bento-illus">
+          <div class="notif-grid">
+            <div class="notif-item"><div class="notif-icon notif-slack">S</div>Slack</div>
+            <div class="notif-item"><div class="notif-icon notif-teams">T</div>Teams</div>
+            <div class="notif-item"><div class="notif-icon notif-pager">P</div>PagerDuty</div>
+            <div class="notif-item"><div class="notif-icon notif-discord">D</div>Discord</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-3 reveal">
+        <div class="bento-eyebrow">Environments</div>
+        <h3 class="bento-title">Prod, staging, dev — tracked separately.</h3>
+        <p class="bento-desc">Different URLs, different alert channels.</p>
+        <div class="bento-illus">
+          <div class="env-list">
+            <div class="env-row">
+              <span class="env-name">production</span>
+              <div class="env-status"><span class="env-pulse" style="background:var(--green)"></span><span style="color:var(--green); font-weight:600;">Healthy</span></div>
+            </div>
+            <div class="env-row">
+              <span class="env-name">staging</span>
+              <div class="env-status"><span class="env-pulse" style="background:var(--orange)"></span><span style="color:var(--orange); font-weight:600;">2 issues</span></div>
+            </div>
+            <div class="env-row">
+              <span class="env-name">dev</span>
+              <div class="env-status"><span class="env-pulse" style="background:var(--green)"></span><span style="color:var(--green); font-weight:600;">Healthy</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-3 reveal">
+        <div class="bento-eyebrow">BYOK</div>
+        <h3 class="bento-title">Bring your own AI keys.</h3>
+        <p class="bento-desc">All three vendors. Pay direct.</p>
+        <div class="bento-illus">
+          <div class="byok-row">
+            <div class="byok-card"><div class="byok-logo byok-c">C</div><div class="byok-name">Claude</div><div class="byok-vendor">Anthropic</div></div>
+            <div class="byok-card"><div class="byok-logo byok-g">G</div><div class="byok-name">GPT-4</div><div class="byok-vendor">OpenAI</div></div>
+            <div class="byok-card"><div class="byok-logo byok-m">M</div><div class="byok-name">Gemini</div><div class="byok-vendor">Google</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bento-card bento-3 reveal">
+        <div class="bento-eyebrow">Flake detection</div>
+        <h3 class="bento-title">Auto-retries cut alert fatigue.</h3>
+        <p class="bento-desc">Pass on retry? Mark flaky. Don't ping.</p>
+        <div class="bento-illus">
+          <div class="flake-illus">
+            <div class="flake-row"><span class="flake-attempt">Try 1:</span><span class="flake-status flake-fail">Fail</span></div>
+            <div class="flake-row"><span class="flake-attempt">Try 2:</span><span class="flake-status flake-pass">Pass</span></div>
+            <div class="flake-row"><span class="flake-flag">→ Marked as flaky, not pinging team</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="section section-light">
+  <div class="container">
+    <span class="section-eyebrow">Pricing</span>
+    <h2 class="section-title">Simple. No maze.</h2>
+    <p class="section-sub">Two plans. No "contact sales" until you actually need it. Cancel anytime.</p>
+
+    <div class="pricing">
+      <article class="tier reveal">
+        <h3 class="tier-name">Solo</h3>
+        <p class="tier-desc">Founders and small teams</p>
+        <div class="tier-price">
+          <span class="tier-amount">$79</span>
+          <span class="tier-period">/ month</span>
+        </div>
+        <p class="tier-trial">14 days free, no card</p>
+        <ul class="tier-list">
+          <li>1 web app, 1 environment</li>
+          <li>Single-AI verification</li>
+          <li>Daily AI testing</li>
+          <li>Universal notifications</li>
+          <li>Self-healing tests</li>
+          <li>30-day run history</li>
+          <li>Email support</li>
+        </ul>
+        <a href="#start" class="tier-cta tier-cta-light">Start trial</a>
+      </article>
+
+      <article class="tier tier-featured reveal">
+        <span class="tier-badge">Most popular</span>
+        <h3 class="tier-name">Team</h3>
+        <p class="tier-desc">Engineering teams shipping daily</p>
+        <div class="tier-price">
+          <span class="tier-amount">$249</span>
+          <span class="tier-period">/ month</span>
+        </div>
+        <p class="tier-trial">14 days free, annual saves 20%</p>
+        <ul class="tier-list">
+          <li>Unlimited web, iOS, Android apps</li>
+          <li>Triple-AI verification (Claude + GPT + Gemini)</li>
+          <li>Up to 3 environments</li>
+          <li>Pre-deploy regression block</li>
+          <li>Visual regression with AI</li>
+          <li>90-day history with video replay</li>
+          <li>Multi-user with roles</li>
+          <li>Stakeholder reports</li>
+          <li>Jira, Linear, GitHub sync</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#start" class="tier-cta tier-cta-pri" style="background: linear-gradient(135deg, #7C5CFA 0%, #FF2D55 100%); color:white;">Start trial</a>
+      </article>
+    </div>
+
+    <p style="text-align:center; margin-top:32px; font-size:14px; color:var(--gray-500);">
+      Need on-prem, SSO, or unlimited environments? <a href="mailto:enterprise@sweepqa.com" style="color: var(--blue);">Talk to us about Enterprise →</a>
+    </p>
+  </div>
+</section>
+
+<section id="start" class="cta-section">
+  <div class="container">
+    <span class="section-eyebrow">Get started</span>
+    <h2 class="section-title">Catch the next bug before<br>your customers do.</h2>
+    <p class="section-sub">14 days free. No credit card. Setup in 90 seconds.</p>
+    <form class="cta-form" id="signup-form" novalidate>
+      <input type="email" id="signup-email" placeholder="you@company.com" required>
+      <button type="submit">Get started →</button>
+    </form>
+    <p class="cta-note" id="signup-note">We'll email you a setup link within 5 minutes.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand-col">
+        <a href="/" class="brand">
+          <span class="brand-mark"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="28" height="28" rx="9" fill="#1d1d1f"/><path d="M10 16 L14 20 L22 12" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span>Sweep</span>
+        </a>
+        <p class="footer-tag">Industry-first triple-AI QA testing for web and mobile. Replace 80% of manual QA work.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#how">How it works</a>
+        <a href="#first">Industry first</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <h4>Compare</h4>
+        <a href="#">vs QA Wolf</a>
+        <a href="#">vs Bug0</a>
+        <a href="#">vs Mabl</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="mailto:hello@sweepqa.com">Contact</a>
+        <a href="mailto:enterprise@sweepqa.com">Enterprise</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Sweep. AI QA testing built for teams that ship.</p>
+      <p>Made for fast-moving teams.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  // Header scroll
+  const header = document.getElementById('header');
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 8) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  // Reveal animations
+  const reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
+    reveals.forEach((el) => io.observe(el));
+  } else {
+    reveals.forEach((el) => el.classList.add('in'));
+  }
+
+  // Form
+  const form = document.getElementById('signup-form');
+  const note = document.getElementById('signup-note');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('signup-email');
+      const email = (emailInput.value || '').trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        note.textContent = 'Enter a valid email address.';
+        note.style.color = '#E5484D';
+        emailInput.focus();
+        return;
+      }
+      const subject = encodeURIComponent('Trial signup — Sweep');
+      const body = encodeURIComponent(`Hi Sweep,\n\nI'd like to start the free trial.\n\nMy email: ${email}\n\nThanks.`);
+      window.location.href = `mailto:hello@sweepqa.com?subject=${subject}&body=${body}`;
+      note.textContent = 'Opening your email client. Send the message and we will reply with your setup link.';
+      note.style.color = '#29CC74';
+    });
+  }
+})();
+</script>
+</body>
+</html>
