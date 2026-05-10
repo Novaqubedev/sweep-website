@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://sweepqa.com/sitemap.xml
+Sitemap: https://sweep-website-66dr.onrender.com/sitemap.xml
