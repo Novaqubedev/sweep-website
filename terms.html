@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Terms of Service — Sweep</title>
+<meta name="description" content="Sweep terms of service. Acceptable use and account terms.">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='9' fill='%231d1d1f'/%3E%3Cpath d='M10 16 L14 20 L22 12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1d1d1f;
+  --ink-2: #2d2d2f;
+  --muted: #6e6e73;
+  --line: #d2d2d7;
+  --bg: #ffffff;
+  --bg-soft: #f5f5f7;
+  --blue: #0071e3;
+  --max: 720px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+.nav { border-bottom: 1px solid var(--line); padding: 16px 24px; }
+.nav-inner { max-width: var(--max); margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.brand { font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 18px; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.brand-mark { width: 24px; height: 24px; }
+main { max-width: var(--max); margin: 0 auto; padding: 48px 24px 96px; }
+h1 { font-family: 'Inter Tight', sans-serif; font-size: 40px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+h2 { font-family: 'Inter Tight', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin-top: 40px; margin-bottom: 12px; }
+.last-updated { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+p { margin-bottom: 16px; color: var(--ink-2); }
+ul { margin-left: 24px; margin-bottom: 16px; }
+li { margin-bottom: 6px; color: var(--ink-2); }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.footer { border-top: 1px solid var(--line); padding: 24px; text-align: center; font-size: 14px; color: var(--muted); }
+.footer a { color: var(--muted); margin: 0 12px; }
+@media (max-width: 600px) {
+  h1 { font-size: 30px; }
+  h2 { font-size: 19px; }
+  body { font-size: 16px; }
+  main { padding: 32px 20px 64px; }
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark"><svg aria-hidden="true" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="28" height="28" rx="9" fill="#1d1d1f"/><path d="M10 16 L14 20 L22 12" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      Sweep
+    </a>
+  </div>
+</nav>
+
+<main>
+  <h1>Terms of Service</h1>
+  <p class="last-updated">Last updated: 11 May 2026</p>
+
+  <p>These terms ("Terms") govern your access to and use of Sweep ("Sweep", "we", "us"). By using the service, you agree to these Terms.</p>
+
+  <h2>1. The service</h2>
+  <p>Sweep is an AI-powered QA testing platform that generates automated tests for web and mobile applications, runs them against your environments, and uses multiple AI models to verify reported bugs.</p>
+  <p>The service is provided on an "as-is" and "as available" basis during the trial and early-access period. Features, pricing, and availability may change as the product evolves.</p>
+
+  <h2>2. Accounts</h2>
+  <p>To use Sweep, you must create an account and provide accurate information. You are responsible for safeguarding your credentials and for all activity under your account. Notify us immediately at <a href="mailto:hello@sweepqa.com">hello@sweepqa.com</a> if you suspect unauthorised access.</p>
+
+  <h2>3. Acceptable use</h2>
+  <p>You agree not to:</p>
+  <ul>
+    <li>Use the service to test applications you do not own or have explicit permission to test.</li>
+    <li>Use Sweep for any unlawful purpose, including denial-of-service, intrusion, or harassment of third parties.</li>
+    <li>Reverse-engineer, decompile, or attempt to bypass technical protections.</li>
+    <li>Use the service to generate harmful, illegal, or misleading content.</li>
+    <li>Resell the service or hold yourself out as the provider of the service.</li>
+  </ul>
+
+  <h2>4. Your data and API keys</h2>
+  <p>You retain ownership of your data, test definitions, bug reports, and any API keys you provide. We process your data only as needed to deliver the service and as described in our <a href="/privacy.html">Privacy Policy</a>.</p>
+  <p>You are responsible for ensuring you have the right to share with Sweep any data, code, or credentials you upload or configure.</p>
+
+  <h2>5. Third-party AI providers</h2>
+  <p>Sweep relies on AI services from third parties (currently Anthropic, OpenAI, and Google) under a Bring-Your-Own-Key (BYOK) model. By using these features, you agree to comply with each provider's terms of service. Sweep is not responsible for the availability, accuracy, or output of third-party AI services.</p>
+
+  <h2>6. Pricing and billing</h2>
+  <p>During the trial period, the service may be free of charge. Pricing for paid plans is shown on our website and may change with notice. You are responsible for all costs incurred from third-party services you connect (e.g. AI provider API usage, BrowserStack minutes).</p>
+
+  <h2>7. Service availability</h2>
+  <p>We aim for high availability but do not guarantee uninterrupted service. Scheduled maintenance, third-party outages, or unforeseen events may cause downtime. We are not liable for delays or failures caused by circumstances beyond our reasonable control.</p>
+
+  <h2>8. Termination</h2>
+  <p>You may stop using Sweep and request account deletion at any time. We may suspend or terminate accounts that violate these Terms or that pose a security risk, with reasonable notice where possible.</p>
+
+  <h2>9. Disclaimer of warranties</h2>
+  <p>The service is provided "as-is" without warranties of any kind. AI-generated test cases and bug verdicts may contain errors and should not be relied upon as the sole basis for engineering decisions. You are responsible for reviewing and validating AI output before acting on it.</p>
+
+  <h2>10. Limitation of liability</h2>
+  <p>To the maximum extent permitted by law, Sweep is not liable for any indirect, incidental, consequential, or punitive damages arising from your use of the service. Our total liability is limited to the amounts you have paid for the service in the twelve months preceding the claim.</p>
+
+  <h2>11. Changes</h2>
+  <p>We may update these Terms from time to time. Material changes will be communicated to active users by email or in-product notice. Continued use after a change constitutes acceptance.</p>
+
+  <h2>12. Governing law</h2>
+  <p>These Terms are governed by the laws of England and Wales. Any disputes will be resolved in the courts of England and Wales, unless local consumer protection law mandates otherwise.</p>
+
+  <h2>13. Contact</h2>
+  <p>Questions about these Terms: <a href="mailto:hello@sweepqa.com">hello@sweepqa.com</a>.</p>
+</main>
+
+<footer class="footer">
+  <a href="/">Home</a>
+  <a href="/privacy.html">Privacy</a>
+  <a href="/terms.html">Terms</a>
+  <span style="display:block;margin-top:8px;">© 2026 Sweep. All rights reserved.</span>
+</footer>
+</body>
+</html>
